@@ -1107,7 +1107,9 @@ document.addEventListener('DOMContentLoaded', function() {
         (function(eid) {
           del.addEventListener('click', function() {
             scheduleData = scheduleData.filter(function(x) { return x.id !== eid; });
+            window.__scheduleData = scheduleData;
             renderList();
+            if (window.saveToFirebase) window.saveToFirebase(window.__courseStatusRef || {}, scheduleData);
           });
         })(entry.id);
 
@@ -1156,8 +1158,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var checks = document.querySelectorAll('.sb-day-check');
     for (var i = 0; i < checks.length; i++) checks[i].checked = false;
 
+    window.__scheduleData = scheduleData;
     renderList();
     closeForm();
+    if (window.saveToFirebase) window.saveToFirebase(window.__courseStatusRef || {}, scheduleData);
   });
 
   document.addEventListener('firebase-loaded', function() {
