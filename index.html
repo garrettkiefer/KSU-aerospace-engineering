@@ -757,24 +757,19 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
-  /* ── Tab switching ── */
   var tabBtnFlowchart   = document.getElementById('tab-btn-flowchart');
   var tabBtnSchedule    = document.getElementById('tab-btn-schedule');
   var tabPanelFlowchart = document.getElementById('tab-flowchart');
   var tabPanelSchedule  = document.getElementById('tab-schedule');
-
   function switchTab(id) {
     tabPanelFlowchart.style.display = (id === 'flowchart') ? 'block' : 'none';
     tabPanelSchedule.style.display  = (id === 'schedule')  ? 'block' : 'none';
     tabBtnFlowchart.className = 'tab-btn' + (id === 'flowchart' ? ' active' : '');
     tabBtnSchedule.className  = 'tab-btn' + (id === 'schedule'  ? ' active' : '');
   }
-
   if (tabBtnFlowchart) tabBtnFlowchart.addEventListener('click', function() { switchTab('flowchart'); });
   if (tabBtnSchedule)  tabBtnSchedule.addEventListener('click',  function() { switchTab('schedule'); });
 
-  /* ── Popup ── */
   var popup        = document.getElementById('prereq-popup');
   var ppCode       = document.getElementById('pp-code');
   var ppName       = document.getElementById('pp-name');
@@ -785,45 +780,32 @@ document.addEventListener('DOMContentLoaded', function() {
   var btnNone      = document.getElementById('btn-none');
   var progressBar  = document.getElementById('progress-bar');
   var progressLabel= document.getElementById('progress-label');
-
   var courseStatus = {};
-  var activeNode   = null;
-  var activeCode   = null;
+  var activeNode = null;
+  var activeCode = null;
 
   if (btnComplete) btnComplete.addEventListener('click', function(e) { e.stopPropagation(); setStatus('complete'); });
   if (btnProgress) btnProgress.addEventListener('click', function(e) { e.stopPropagation(); setStatus('progress'); });
   if (btnNone)     btnNone.addEventListener('click',     function(e) { e.stopPropagation(); setStatus('none'); });
 
-  /* ── Prereq map ── */
   var PREREQ_MAP = {
-    'MATH 1113 (min C)':                            ['MATH 1113'],
-    'MATH 1112 or MATH 1113 (min C)':               ['MATH 1113'],
-    'MATH 1190 (min C)':                            ['MATH 1190'],
-    'MATH 2202 (min C)':                            ['MATH 2202'],
-    'MATH 2203 (min C)':                            ['MATH 2203'],
-    'MATH 2306 (min C)':                            ['MATH 2306'],
-    'PHYS 2211 (min C)':                            ['PHYS 2211/L'],
-    'PHYS 2211/L (min C)':                          ['PHYS 2211/L'],
-    'PHYS 2211 and PHYS 2211L (min C)':             ['PHYS 2211/L'],
-    'PHYS 2212 (min C)':                            ['PHYS 2212/L'],
-    'PHYS 2212/L (min C)':                          ['PHYS 2212/L'],
-    'PHYS 2212 and PHYS 2212L (min C)':             ['PHYS 2212/L'],
-    'ENGR 1000 (min C)':                            ['ENGR 1000'],
-    'AAE 1001L (min C)':                            ['AAE 1001L','ME 1001L'],
-    'ME 1001L or AAE 1001L (min C)':                ['ME 1001L','AAE 1001L'],
-    'ENGR 2214 (min C)':                            ['ENGR 2214'],
-    'ENGR 3122 (min C)':                            ['ENGR 3122'],
-    'ENGR 3131 (min C)':                            ['ENGR 3131'],
-    'ENGR 3132 (min C)':                            ['ENGR 3132'],
-    'ENGR 3801 (min C)':                            ['ENGR 3801'],
-    'ENGR 3804 (min C)':                            ['ENGR 3804'],
-    'ME 3410 (min C)':                              ['ME 3410'],
+    'MATH 1113 (min C)': ['MATH 1113'], 'MATH 1112 or MATH 1113 (min C)': ['MATH 1113'],
+    'MATH 1190 (min C)': ['MATH 1190'], 'MATH 2202 (min C)': ['MATH 2202'],
+    'MATH 2203 (min C)': ['MATH 2203'], 'MATH 2306 (min C)': ['MATH 2306'],
+    'PHYS 2211 (min C)': ['PHYS 2211/L'], 'PHYS 2211/L (min C)': ['PHYS 2211/L'],
+    'PHYS 2211 and PHYS 2211L (min C)': ['PHYS 2211/L'],
+    'PHYS 2212 (min C)': ['PHYS 2212/L'], 'PHYS 2212/L (min C)': ['PHYS 2212/L'],
+    'PHYS 2212 and PHYS 2212L (min C)': ['PHYS 2212/L'],
+    'ENGR 1000 (min C)': ['ENGR 1000'], 'AAE 1001L (min C)': ['AAE 1001L','ME 1001L'],
+    'ME 1001L or AAE 1001L (min C)': ['ME 1001L','AAE 1001L'],
+    'ENGR 2214 (min C)': ['ENGR 2214'], 'ENGR 3122 (min C)': ['ENGR 3122'],
+    'ENGR 3131 (min C)': ['ENGR 3131'], 'ENGR 3132 (min C)': ['ENGR 3132'],
+    'ENGR 3801 (min C)': ['ENGR 3801'], 'ENGR 3804 (min C)': ['ENGR 3804'],
+    'ME 3410 (min C)': ['ME 3410'],
     'MATH 1111 or MATH 1113 or MATH 1190 (min C)': ['MATH 1113','MATH 1190'],
-    'CHEM 1211 or CHEM 1211K (min C)':              ['CHEM 1211K'],
-    'AAE 4250 (min C)':                             ['AAE 4250'],
-    'AAE 4203 (min C)':                             ['AAE 4203'],
-    'AAE 3125 (min C)':                             ['AAE 3125'],
-    'ENGL 1101':                                    ['ENGL 1101']
+    'CHEM 1211 or CHEM 1211K (min C)': ['CHEM 1211K'],
+    'AAE 4250 (min C)': ['AAE 4250'], 'AAE 4203 (min C)': ['AAE 4203'],
+    'AAE 3125 (min C)': ['AAE 3125'], 'ENGL 1101': ['ENGL 1101']
   };
 
   function getStatusForLabel(label) {
@@ -841,50 +823,40 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function updateCardOverlay(node) {
-    var code   = node.getAttribute('data-code');
+    var code = node.getAttribute('data-code');
     var status = courseStatus[code] || 'none';
     var existing = node.querySelector('.status-overlay');
     if (existing) existing.parentNode.removeChild(existing);
     if (status === 'none') return;
-
     var rect = node.querySelector('rect');
     var rx = parseFloat(rect.getAttribute('x'));
     var ry = parseFloat(rect.getAttribute('y'));
     var ns = 'http://www.w3.org/2000/svg';
-    var g  = document.createElementNS(ns, 'g');
+    var g = document.createElementNS(ns, 'g');
     g.setAttribute('class', 'status-overlay');
-
     var circle = document.createElementNS(ns, 'circle');
-    circle.setAttribute('cx', rx+11); circle.setAttribute('cy', ry+11);
-    circle.setAttribute('r', '8');
+    circle.setAttribute('cx', rx+11); circle.setAttribute('cy', ry+11); circle.setAttribute('r', '8');
     circle.setAttribute('fill', status === 'complete' ? '#2e7d4f' : '#c8940a');
     circle.setAttribute('stroke', '#fff'); circle.setAttribute('stroke-width', '1.5');
     g.appendChild(circle);
-
     if (status === 'complete') {
       var check = document.createElementNS(ns, 'path');
       check.setAttribute('d', 'M'+(rx+7)+' '+(ry+11)+' L'+(rx+10)+' '+(ry+14)+' L'+(rx+15)+' '+(ry+8));
       check.setAttribute('fill','none'); check.setAttribute('stroke','#fff');
       check.setAttribute('stroke-width','2'); check.setAttribute('stroke-linecap','round');
-      check.setAttribute('stroke-linejoin','round');
-      g.appendChild(check);
+      check.setAttribute('stroke-linejoin','round'); g.appendChild(check);
     } else {
       var inner = document.createElementNS(ns,'circle');
-      inner.setAttribute('cx',rx+11); inner.setAttribute('cy',ry+11);
-      inner.setAttribute('r','5'); inner.setAttribute('fill','none');
-      inner.setAttribute('stroke','#fff'); inner.setAttribute('stroke-width','1');
+      inner.setAttribute('cx',rx+11); inner.setAttribute('cy',ry+11); inner.setAttribute('r','5');
+      inner.setAttribute('fill','none'); inner.setAttribute('stroke','#fff'); inner.setAttribute('stroke-width','1');
       g.appendChild(inner);
       var hour = document.createElementNS(ns,'line');
-      hour.setAttribute('x1',rx+11); hour.setAttribute('y1',ry+11);
-      hour.setAttribute('x2',rx+9);  hour.setAttribute('y2',ry+8);
-      hour.setAttribute('stroke','#fff'); hour.setAttribute('stroke-width','1.2');
-      hour.setAttribute('stroke-linecap','round');
+      hour.setAttribute('x1',rx+11); hour.setAttribute('y1',ry+11); hour.setAttribute('x2',rx+9); hour.setAttribute('y2',ry+8);
+      hour.setAttribute('stroke','#fff'); hour.setAttribute('stroke-width','1.2'); hour.setAttribute('stroke-linecap','round');
       g.appendChild(hour);
       var minute = document.createElementNS(ns,'line');
-      minute.setAttribute('x1',rx+11); minute.setAttribute('y1',ry+11);
-      minute.setAttribute('x2',rx+14); minute.setAttribute('y2',ry+9);
-      minute.setAttribute('stroke','#fff'); minute.setAttribute('stroke-width','1.2');
-      minute.setAttribute('stroke-linecap','round');
+      minute.setAttribute('x1',rx+11); minute.setAttribute('y1',ry+11); minute.setAttribute('x2',rx+14); minute.setAttribute('y2',ry+9);
+      minute.setAttribute('stroke','#fff'); minute.setAttribute('stroke-width','1.2'); minute.setAttribute('stroke-linecap','round');
       g.appendChild(minute);
     }
     node.appendChild(g);
@@ -892,31 +864,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function buildPrereqList(prereqStr) {
     ppPrereqs.innerHTML = '';
-    if (!prereqStr) {
-      var none = document.createElement('li');
-      none.className = 'none'; none.textContent = 'None';
-      ppPrereqs.appendChild(none); return;
-    }
+    if (!prereqStr) { var none = document.createElement('li'); none.className = 'none'; none.textContent = 'None'; ppPrereqs.appendChild(none); return; }
     var parts = prereqStr.split(';');
     for (var i = 0; i < parts.length; i++) {
-      var p  = parts[i].trim();
+      var p = parts[i].trim();
       var li = document.createElement('li');
       var st = getStatusForLabel(p);
       if (st === 'complete' || st === 'progress') {
-        var icon = document.createElement('span');
-        icon.className = 'pi';
-        icon.textContent = st === 'complete' ? '\u2705' : '\u23F0';
-        li.appendChild(icon);
+        var icon = document.createElement('span'); icon.className = 'pi';
+        icon.textContent = st === 'complete' ? '\u2705' : '\u23F0'; li.appendChild(icon);
       }
-      li.appendChild(document.createTextNode(p));
-      ppPrereqs.appendChild(li);
+      li.appendChild(document.createTextNode(p)); ppPrereqs.appendChild(li);
     }
   }
 
   function updateButtonStates(status) {
-    btnComplete.className = status === 'complete' ? 'active-complete' : '';
-    btnProgress.className = status === 'progress' ? 'active-progress' : '';
-    btnNone.className = '';
+    if (btnComplete) btnComplete.className = status === 'complete' ? 'active-complete' : '';
+    if (btnProgress) btnProgress.className = status === 'progress' ? 'active-progress' : '';
+    if (btnNone)     btnNone.className = '';
   }
 
   function setStatus(status) {
@@ -926,6 +891,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateButtonStates(status);
     buildPrereqList(activeNode ? activeNode.getAttribute('data-prereqs') : '');
     updateProgressBar();
+    if (window.saveToFirebase) window.saveToFirebase(courseStatus, window.__scheduleData || []);
   }
 
   function updateProgressBar() {
@@ -941,79 +907,60 @@ document.addEventListener('DOMContentLoaded', function() {
       else if (s === 'progress') nProgress++;
     }
     var nNone = total - nComplete - nProgress;
-    var pct   = Math.round((nComplete / total) * 100);
-    progressLabel.innerHTML =
-      '<strong style="color:#2e7d4f">'+nComplete+'</strong> complete' +
-      ' &nbsp;&middot;&nbsp; <strong style="color:#c8940a">'+nProgress+'</strong> in progress' +
-      ' &nbsp;&middot;&nbsp; '+nNone+' remaining' +
-      ' &nbsp;&middot;&nbsp; <strong>'+pct+'% done</strong>';
+    var pct = Math.round((nComplete / total) * 100);
+    progressLabel.innerHTML = '<strong style="color:#2e7d4f">'+nComplete+'</strong> complete &nbsp;&middot;&nbsp; <strong style="color:#c8940a">'+nProgress+'</strong> in progress &nbsp;&middot;&nbsp; '+nNone+' remaining &nbsp;&middot;&nbsp; <strong>'+pct+'% done</strong>';
     progressBar.innerHTML = '';
     function addSeg(n, color) {
       if (n <= 0) return;
       var seg = document.createElement('div');
-      seg.style.width      = (n/total*100)+'%';
-      seg.style.background = color;
-      seg.style.height     = '100%';
-      seg.style.transition = 'width 0.4s ease';
+      seg.style.width = (n/total*100)+'%'; seg.style.background = color;
+      seg.style.height = '100%'; seg.style.transition = 'width 0.4s ease';
       progressBar.appendChild(seg);
     }
-    addSeg(nComplete,'#2e7d4f');
-    addSeg(nProgress,'#c8940a');
-    addSeg(nNone,'#d8d8d2');
+    addSeg(nComplete,'#2e7d4f'); addSeg(nProgress,'#c8940a'); addSeg(nNone,'#d8d8d2');
   }
 
-  /* ── Node click handlers ── */
+  function restoreCourseStatus() {
+    if (!window.__restoredCourseStatus) return;
+    var cs = window.__restoredCourseStatus;
+    for (var code in cs) {
+      if (!cs.hasOwnProperty(code)) continue;
+      courseStatus[code] = cs[code];
+    }
+    var allNodes = document.querySelectorAll('.node[data-code]');
+    for (var i = 0; i < allNodes.length; i++) updateCardOverlay(allNodes[i]);
+    updateProgressBar();
+  }
+
   var nodes = document.querySelectorAll('.node');
   for (var ni = 0; ni < nodes.length; ni++) {
     (function(node) {
       node.addEventListener('click', function(e) {
         e.stopPropagation();
         if (!popup) return;
-
         var isActive = popup.style.display === 'block' && activeNode === this;
-        if (activeNode && activeNode !== this) {
-          activeNode = null; activeCode = null;
-        }
-        if (isActive) {
-          popup.style.display = 'none';
-          activeNode = null; activeCode = null;
-          return;
-        }
-
+        if (activeNode && activeNode !== this) { activeNode = null; activeCode = null; }
+        if (isActive) { popup.style.display = 'none'; activeNode = null; activeCode = null; return; }
         activeNode = this;
         activeCode = this.getAttribute('data-code') || '';
-
         ppCode.textContent = activeCode;
         ppName.textContent = this.getAttribute('data-name') || '';
         buildPrereqList(this.getAttribute('data-prereqs') || '');
-
         var concurrent = this.getAttribute('data-concurrent') || '';
-        ppConcurrent.textContent    = concurrent;
-        ppConcurrent.style.display  = concurrent ? 'block' : 'none';
-
-        if (btnComplete && btnProgress && btnNone) {
-          updateButtonStates(courseStatus[activeCode] || 'none');
-        }
-
+        ppConcurrent.textContent = concurrent;
+        ppConcurrent.style.display = concurrent ? 'block' : 'none';
+        updateButtonStates(courseStatus[activeCode] || 'none');
         popup.style.display = 'block';
-        popup.style.left = '-9999px';
-        popup.style.top  = '-9999px';
-
+        popup.style.left = '-9999px'; popup.style.top = '-9999px';
         var margin = 12;
-        var pw = popup.offsetWidth  || 260;
-        var ph = popup.offsetHeight || 200;
-        var vw = window.innerWidth  || 360;
-        var vh = window.innerHeight || 640;
-        var cx = e.clientX || 0;
-        var cy = e.clientY || 0;
-        var x  = cx + margin;
-        var y  = cy + margin;
+        var pw = popup.offsetWidth || 260, ph = popup.offsetHeight || 200;
+        var vw = window.innerWidth || 360, vh = window.innerHeight || 640;
+        var cx = e.clientX || 0, cy = e.clientY || 0;
+        var x = cx + margin, y = cy + margin;
         if (x + pw > vw - margin) x = cx - pw - margin;
         if (y + ph > vh - margin) y = cy - ph - margin;
-        if (x < margin) x = margin;
-        if (y < margin) y = margin;
-        popup.style.left = x + 'px';
-        popup.style.top  = y + 'px';
+        if (x < margin) x = margin; if (y < margin) y = margin;
+        popup.style.left = x + 'px'; popup.style.top = y + 'px';
       });
     })(nodes[ni]);
   }
@@ -1024,10 +971,10 @@ document.addEventListener('DOMContentLoaded', function() {
     activeNode = null; activeCode = null;
   });
 
+  document.addEventListener('firebase-loaded', function() { restoreCourseStatus(); });
   updateProgressBar();
 });
 </script>
-
 <script>
 /* ── Schedule Builder ── */
 document.addEventListener('DOMContentLoaded', function() {
@@ -1202,8 +1149,80 @@ document.addEventListener('DOMContentLoaded', function() {
     closeForm();
   });
 
+  document.addEventListener('firebase-loaded', function() {
+    if (window.__restoredScheduleData && window.__restoredScheduleData.length > 0) {
+      scheduleData = window.__restoredScheduleData;
+      for (var i = 0; i < scheduleData.length; i++) {
+        if (scheduleData[i].id >= idCounter) idCounter = scheduleData[i].id + 1;
+      }
+      window.__scheduleData = scheduleData;
+      renderList();
+    }
+  });
+
   renderList();
 });
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+(function() {
+  var firebaseConfig = {
+    apiKey: "AIzaSyC6DoBQxHi92ay0wp6kPFvgtrJfA67j6B4",
+    authDomain: "ksu-aerospace-engineering.firebaseapp.com",
+    projectId: "ksu-aerospace-engineering",
+    storageBucket: "ksu-aerospace-engineering.firebasestorage.app",
+    messagingSenderId: "1064485024661",
+    appId: "1:1064485024661:web:ae34e3b9a4901fa661bc9c"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+  var docRef = db.collection('app-data').doc('shared');
+
+  // ── Save everything to Firestore
+  window.saveToFirebase = function(courseStatus, scheduleData) {
+    window.__courseStatusRef = courseStatus;
+    docRef.set({
+      courseStatus: courseStatus,
+      scheduleData: scheduleData
+    }).catch(function(err) {
+      console.error('Firebase save error:', err);
+    });
+  };
+
+  // ── Load on startup and apply state
+  docRef.get().then(function(doc) {
+    if (!doc.exists) return;
+    var data = doc.data();
+
+    // Restore course statuses
+    if (data.courseStatus) {
+      var cs = data.courseStatus;
+      for (var code in cs) {
+        if (!cs.hasOwnProperty(code)) continue;
+        window.__restoredCourseStatus = window.__restoredCourseStatus || {};
+        window.__restoredCourseStatus[code] = cs[code];
+      }
+    }
+
+    // Restore schedule data
+    if (data.scheduleData && Array.isArray(data.scheduleData)) {
+      window.__restoredScheduleData = data.scheduleData;
+    }
+
+    // Signal that Firebase data is ready
+    document.dispatchEvent(new Event('firebase-loaded'));
+
+  }).catch(function(err) {
+    console.error('Firebase load error:', err);
+    // Still fire the event so the app works even if Firebase fails
+    document.dispatchEvent(new Event('firebase-loaded'));
+  });
+})();
 </script>
 </body>
 </html>
